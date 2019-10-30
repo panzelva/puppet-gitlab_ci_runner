@@ -45,6 +45,12 @@ class gitlab_ci_runner (
   Stdlib::Fqdn               $repo_keyserver           = 'keys.gnupg.net',
   String                     $config_path              = '/etc/gitlab-runner/config.toml',
 ){
+  file { $config_path: # ensure config exists
+    ensure  => 'present',
+    replace => 'no',
+    content => '',
+  }
+
   if $manage_docker {
     # workaround for cirunner issue #1617
     # https://gitlab.com/gitlab-org/gitlab-ci-multi-runner/issues/1617
@@ -118,12 +124,6 @@ class gitlab_ci_runner (
   service { $package_name:
     ensure => running,
     enable => true,
-  }
-
-  file { $config_path: # ensure config exists
-    ensure  => 'present',
-    replace => 'no',
-    content => '',
   }
 
   if $concurrent != undef {
